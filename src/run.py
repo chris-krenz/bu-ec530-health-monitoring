@@ -2,13 +2,18 @@
 
 """
 
-import utils as utils
+import logging as log
+
+from utils import logger
+from utils import id
 
 
 def main():
 
-    test = utils.id.LastFirstMiddleName('Doe', 'John', '')
-    print(test)
+    logger.config_logger()
+
+    test = id.LastFirstMiddleName('Doe', 'John', '')
+    log.info(test)
 
 
 if __name__ == '__main__':
