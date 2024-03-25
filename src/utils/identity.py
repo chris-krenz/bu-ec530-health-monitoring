@@ -13,12 +13,12 @@ class LastFirstMiddleName:
     Full name, including: last and, optionally, first and middle
     """
     last:   str
-    first:  str = field(default='')
+    first:  str
     middle: str = field(default='')
 
     last_verified: datetime.today = field(default=datetime.today())
 
-    def update(self, last: str, first: str = '', middle: str = ''):
+    def update(self, last, first, middle=''):
         # TODO: Validate Name formatting
         self.last = last
         self.first = first
@@ -39,14 +39,14 @@ class SSN:
     """
     Social Security Number
     """
-    __ssn: str
+    ssn: str
 
     @property
-    def __ssn(self) -> str:
+    def ssn(self) -> str:
         return self.__ssn
 
-    @__ssn.setter
-    def __ssn(self, ssn: str) -> None:
+    @ssn.setter
+    def ssn(self, ssn: str) -> None:
         """
         ssn: The new SSN to replace the old one; should be 11 character string that includes the '-' separators
         """
@@ -54,21 +54,22 @@ class SSN:
         # TODO: Add caller authentication step
 
         area, group, serial = ssn.split('-')
+        print(area, group, serial)
         if (len(area), len(group), len(serial) == 3, 2, 4) and area.isdigit() and group.isdigit() and serial.isdigit():
             # TODO: Implement cross-reference of existing SSNs to ensure no duplicate (and external check?)...
             self.__ssn = ssn
         else:
             print("SSN Change Rejected: SSN is malformed.")
 
-    @__ssn.deleter
-    def __ssn(self) -> None:
+    @ssn.deleter
+    def ssn(self) -> None:
 
         # TODO: Add caller authentication step
 
         del self.__ssn
 
-    @__ssn.getter
-    def __ssn(self) -> str:
+    @ssn.getter
+    def ssn(self) -> str:
 
         # TODO: Add caller authentication step
 
@@ -90,16 +91,15 @@ class Address:
 
     last_verified: datetime.today = field(default=datetime.today())
 
-    def update(self, street: str = '', unit: str = '', city: str = '', state: str = '', zip: str = '',
-               country: str = '', other: str = ''):
+    def update(self, street='', unit='', city='', state='', zip='', country='', other=''):
         # TODO: Validate address formatting
-        self.street = street
-        self.unit = unit
-        self.city = city
-        self.state = state
-        self.zip = zip
+        self.street  = street
+        self.unit    = unit
+        self.city    = city
+        self.state   = state
+        self.zip     = zip
         self.country = country
-        self.other = other
+        self.other   = other
 
         self.verify()
 

@@ -5,12 +5,15 @@ Primarily contains the User class with general methods for interacting with devi
 from typing import Union
 import numpy as np
 import logging as log
+from requests import post, get, delete
 
 import src.utils.identity as id
 import src.utils.dataset as dat
 import src.utils.devices as dev
+from src.config import SQL_URL
 
 
+# Just for testing purposes
 def foobar(mat_a: Union[list, tuple, np.array], mat_b: Union[list, tuple, np.array]) -> Union[int, float, np.ndarray]:
     """
     Uses numpy matrix multiplication function (shorthand: @) to multiply two array-like inputs.
@@ -29,7 +32,7 @@ def foobar(mat_a: Union[list, tuple, np.array], mat_b: Union[list, tuple, np.arr
 
 class User:
 
-    def __init__(self, identity: id.Identity, relationships: dat.Dataset, title_or_role: str):
+    def __init__(self, identity: id.Identity, title_or_role='', relationships: dat.Dataset = None):
         self.identity = identity
         self.relationships = relationships
         self.role = title_or_role  # e.g., Doctor, Nurse, Patient, etc.
@@ -45,6 +48,11 @@ class User:
 
     def restart_device(self):
         pass
+
+    def gen_self_report(self):
+        # user_data = get(SQL_URL + 'users/' + str(self.identity.id)).json()
+        user_data = get(SQL_URL + 'users/' + '1').json()
+        log.info(user_data)
 
 
 class Admin(User):
@@ -73,6 +81,10 @@ class Admin(User):
     def test_a_device(self, device: dev.Device):
         pass
 
+    def gen_user_report(self, user: id.Identity):
+        user_data = get(SQL_URL + 'users/' + user).json()
+        log.info(user_data)
+
 
 class Developer(User):
     """
@@ -85,3 +97,7 @@ class Developer(User):
 
     def destroy_simulated_device(self, device: dev.Device):
         pass
+
+    def gen_user_report(self, user: id.Identity):
+        user_data = get(SQL_URL + 'users/' + user).json()
+        log.info(user_data)

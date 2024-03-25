@@ -35,12 +35,18 @@ curl -H "Content-Type: application/json" -d '{"name":"foo"}' http://localhost:80
 
 # Define SQLite table schema
 class users(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
+    id    = db.Column(db.Integer, primary_key=True)
+    name  = db.Column(db.String(20), nullable=False)
+    ssn   = db.Column(db.String(255))
+    email = db.Column(db.String(255))
+    role  = db.Column(db.String(255))
 
-    def __init__(self, id, name):
-        self.id   = id
-        self.name = name
+    def __init__(self, id, name, ssn, email, role):
+        self.id    = id
+        self.name  = name
+        self.ssn   = ssn
+        self.email = email
+        self.role  = role
 
     def __repr__(self):
         return self.name
@@ -49,14 +55,20 @@ class users(db.Model):
 # Define output data schema
 user_definition = {
     'user_id': fields.Integer,
-    'name':    fields.String
+    'name':    fields.String,
+    'ssn':     fields.String,
+    'email':   fields.String,
+    'role':    fields.String
 }
 
 
 class FormatUser(object):
-    def __init__(self, uid, name):
+    def __init__(self, uid, name, ssn, email, role):
         self.user_id = uid
         self.name = name
+        self.ssn = ssn
+        self.email = email
+        self.role = role
 
 
 # Define request parser
@@ -70,7 +82,7 @@ def get_user(user_id):
     try:
         if user:
 
-            return FormatUser(user.id, user.name)
+            return FormatUser(user.id, user.name, user.ssn, user.email, user.role)
 
         else:
 
@@ -127,7 +139,7 @@ class UserAPI(Resource):
 
 # Use the API object to connect the Resource objects to paths on the Flask server
 # /<datatype: input_name> = a way to have variable paths
-api.add_resource(UserAPI, '/user/<int:user_id>')
+api.add_resource(UserAPI, '/users/<int:user_id>')
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)
