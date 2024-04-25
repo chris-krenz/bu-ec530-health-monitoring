@@ -17,9 +17,18 @@ pip install -r requirements.txt
 
 ## Usage
 
-First run app.py in the src folder.
+First, run the following to start the server:
 
-Then run run.py in the root folder.
+```console
+python src/app.py
+```
+
+Then, in a separate terminal, run the following to start the program, which will print a summary report of the users:
+
+```console
+python main.py
+```
+
 
 ### Unit Tests
 ```console
@@ -32,7 +41,14 @@ coverage run -m pytest
 coverage [report | html]
 ```
 
-## Examples
+## Example Output
+
+```json
+(venv) (base) christopherkrenz@crc-dot1x-nat-10-239-132-248 bu-ec530-health-monitoring % python main.py
+{'user_id': 1, 'name': 'Chris Krenz', 'ssn': '111-11-1111', 'email': 'ckrenz@bu.edu', 'role': 'patient'}
+{'user_id': 2, 'name': 'John Doe', 'ssn': '222-22-2222', 'email': 'jonathanbambidoe@bu.edu', 'role': 'admin'}
+{'user_id': 3, 'name': 'Jane Doe', 'ssn': '333-33-3333', 'email': 'janemaryjanedoe@bu.edu', 'role': 'patient'}
+```
 
 
 ## Contributors
