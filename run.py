@@ -8,9 +8,11 @@ import uuid
 from concurrent.futures import ProcessPoolExecutor  # https://www.geeksforgeeks.org/processpoolexecutor-class-in-python/
 from requests import post, get, delete
 
-from src.config import SQL_URL
-from utils import logger
-from utils import id, usr
+from config import SQL_URL
+from src.utils import logger
+from src.utils import id, usr
+
+from src.app import app
 
 user_ids = ['1', '2', '3']
 

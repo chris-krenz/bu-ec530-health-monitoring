@@ -10,7 +10,7 @@ from requests import post, get, delete
 import src.utils.identity as id
 import src.utils.dataset as dat
 import src.utils.devices as dev
-from src.config import SQL_URL
+from config import SQL_URL
 
 
 # Just for testing purposes

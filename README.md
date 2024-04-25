@@ -17,6 +17,10 @@ pip install -r requirements.txt
 
 ## Usage
 
+First run app.py in the src folder.
+
+Then run run.py in the root folder.
+
 ### Unit Tests
 ```console
 pytest
