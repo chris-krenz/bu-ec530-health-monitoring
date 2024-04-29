@@ -23,10 +23,16 @@ First, run the following to start the server:
 python src/app.py
 ```
 
-Then, in a separate terminal, run the following to start the program, which will print a summary report of the users:
+Then, in a separate terminal, either run the following to start the program, which will print a summary report of the users:
 
 ```console
 python main.py
+```
+
+Alternatively, to interact directly with the sanitizing SQL database client, run:
+
+```console
+python src/client.py
 ```
 
 
