@@ -3,57 +3,79 @@ bu-ec530-health-monitoring
 
 ## About
 
-Project 2 for EC530 Software Engineering Principles at BU (Spring 2024). 
+Final Project for EC530 Software Engineering Principles at BU (Spring 2024). 
 
 Implementation of a health monitoring system for patients and medical professionals.
 
+This is a simple app intended to be run via Docker.
 
-## Install
+It consists of a backend Flask server (with an SQL database) and a frontend React webapp.
+
+Accessing the site permits basic CRUD operations.
+
+If any additional features are required, please let me know.
+
+
+## Usage
+
+To create the Docker images, run:
+
+```console
+docker-compose up --build
+```
+
+Alternatively, you can get the images from Docker Hub via: 
+
+```console
+docker pull ckrenz/bu530
+```
+
+You can then run the containers with the following commands (in separate terminals):
+
+```console
+docker run -p 8000:5000 ckrenz/bu530:server-latest
+docker run -p 3000:3000 ckrenz/bu530:webapp-latest
+```
+
+Then go to http://localhost:3000/ to interact with the app.  
+
+You can also go to http://localhost:8000/api to check the server is running.
+
+Once you have access, you can perform basic GET, POST, and DELETE operations on the user database.
+
+## (For Developers)
+
 
 ### Dependencies
+
 ```console
 pip install -r requirements.txt
 ```
 
-## Usage
-
-First, run the following to start the server:
+Then, run the following to start the server:
 
 ```console
 python src/server.py
 ```
 
-Then, in a separate terminal, either run the following to start the program, which will print a summary report of the users:
+Then from the webapp folder run:
 
 ```console
-python src/main.py
+npm start
 ```
 
-Alternatively, to interact directly with the sanitizing SQL database client, run:
+(Or you could run the following for a CLI-based GET commands; handy just to check server status:)
 
 ```console
-python src/client.py
+python src/client.py 
 ```
+
+Note, the webapp is contained entirely inside the webapp folder, and the server is contained within the root src folder.
 
 
 ### Unit Tests
 ```console
 pytest
-```
-
-### Coverage
-```console
-coverage run -m pytest
-coverage [report | html]
-```
-
-## Example Output
-
-```json
-(venv) (base) christopherkrenz@crc-dot1x-nat-10-239-132-248 bu-ec530-health-monitoring % python main.py
-{'user_id': 1, 'name': 'Chris Krenz', 'ssn': '111-11-1111', 'email': 'ckrenz@bu.edu', 'role': 'patient'}
-{'user_id': 2, 'name': 'John Doe', 'ssn': '222-22-2222', 'email': 'jonathanbambidoe@bu.edu', 'role': 'admin'}
-{'user_id': 3, 'name': 'Jane Doe', 'ssn': '333-33-3333', 'email': 'janemaryjanedoe@bu.edu', 'role': 'patient'}
 ```
 
 
@@ -64,4 +86,4 @@ coverage [report | html]
 
 ## License
 
-[MIT License](LICENSE)
+[GNU License](LICENSE)
