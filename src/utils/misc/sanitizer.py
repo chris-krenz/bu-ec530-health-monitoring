@@ -11,7 +11,7 @@ def sanitizer(message: bytes | str) -> str:
     Will be false positives, but erring on the side of safety.
     """
     message = message.decode() if type(message) == bytes else message
-
+    message = str(message)
     # (must also contain a ';')
     restricted_sql = [['select',   'from'],
                       ['drop',     'database'],
@@ -27,8 +27,7 @@ def sanitizer(message: bytes | str) -> str:
 
     if ';' in message:
         for keyword_set in restricted_sql:
-            if all([(keyword in message.lower()) for keyword in keyword_set]):
-                print('TESTING')
+            if any([(keyword in message.lower()) for keyword in keyword_set]):
                 raise RuntimeError('You entered illegal characters, please try again...')
 
     return 'Submitted message clean...'

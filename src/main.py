@@ -8,29 +8,33 @@ import uuid
 from concurrent.futures import ProcessPoolExecutor  # https://www.geeksforgeeks.org/processpoolexecutor-class-in-python/
 from requests import post, get, delete
 
-from config import SQL_URL
-from src.utils import logger
-from src.utils import id, usr
+from src.CONFIG import SQL_URL
+# from utils import logger
+# from utils import id, usr
 
-from src.app import app
+# from app import app
+import app
 
-user_ids = ['1', '2', '3']
+user_ids = ['1', '2', '3', '4']
 
 
 def gen_user_report(user_id):
-    user_data = get(SQL_URL + 'users/' + user_id).json()
+    user_data = get(SQL_URL + 'api/users/' + user_id).json()
     return user_data
 
 
 def main():
 
-    logger.config_logger()
+    # logger.config_logger()
 
     with ProcessPoolExecutor(max_workers=3) as exe:
         reports = exe.map(gen_user_report, user_ids)
-
     for report in reports:
-        log.info(report)
+        # log.info(report)
+        print(report)
+
+    # user_data = get(SQL_URL + 'api/users/' + user_ids[1]).json()
+    # print(user_data)
 
     # test_name = id.LastFirstMiddleName('Doe', 'John', '')
     # test_ssn  = id.SSN('111-11-1111')

@@ -1,0 +1,23 @@
+services:
+  server:
+    build: .
+    ports:
+      - "8000:8000"
+#    links:
+#      - "client"
+    command:
+      sh -c "python src/app.py"
+
+  client:
+    build: .
+    ports:
+      - "443:443"
+#    links:
+#      - "server"
+    depends_on:
+      - server
+    command:
+      sh -c "python src/client.py"
+
+#volumes:
+#  app:

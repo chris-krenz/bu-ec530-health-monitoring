@@ -3,9 +3,9 @@ Client for forming and submitting SQL queries.
 """
 
 from requests import post, get, delete
-import sanitizer
+import utils.misc.sanitizer as sanitizer
 
-url = "http://localhost:8000/"
+url = "http://localhost:8000/api/"
 
 while '0' != (action := input("Enter number: \n\t"
                               "0. Exit... \n\t"

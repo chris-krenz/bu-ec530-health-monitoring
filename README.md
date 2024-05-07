@@ -20,13 +20,13 @@ pip install -r requirements.txt
 First, run the following to start the server:
 
 ```console
-python src/app.py
+python src/server.py
 ```
 
 Then, in a separate terminal, either run the following to start the program, which will print a summary report of the users:
 
 ```console
-python main.py
+python src/main.py
 ```
 
 Alternatively, to interact directly with the sanitizing SQL database client, run:

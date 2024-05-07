@@ -6,18 +6,30 @@ https://medium.com/@dennisivy/my-first-crud-app-with-fast-api-74ac190d2dcc
 https://medium.com/@dennisivy/flask-restful-crud-api-c13c7d82c6e5
 https://stackoverflow.com/questions/73961938/flask-sqlalchemy-db-create-all-raises-runtimeerror-working-outside-of-applicat
 """
-
-from flask import Flask, jsonify, request
-from flask_restful import Resource, Api, fields, marshal_with, reqparse
-from flask_sqlalchemy import SQLAlchemy
 import os
 
-app = Flask(__name__)
-api = Api(app)
+from flask import Flask, jsonify, request, session, make_response
+# from flask_migrate import Migrate
+from flask_cors import CORS, cross_origin
+# from flask_restful import Resource, Api, fields, marshal_with, reqparse
+from flask_restx import Resource, Api, fields, marshal_with, reqparse
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+# from requests import post, get, delete
 
-# Connect to local 'database.db' SQLite file
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-                                        os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database.db')
+from CONFIG import ROOT_DIR
+from utils.misc.sanitizer import sanitizer
+
+# Connect to local '../data/database.db' SQLite file
+app = Flask(__name__)
+# app.secret_key = b'***************************************'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(ROOT_DIR, 'data', 'database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.json.compact = False
+
+CORS(app)
+api = Api(app)
+bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 ''' Standard SQL Commands
@@ -28,8 +40,8 @@ ALTER TABLE main.users DROP COLUMN secret;  -- Delete a column from a table; ADD
 '''
 
 '''cURL Command Examples
-curl -H "Content-Type: application/json" -d '{"name":"foo"}' http://localhost:8000/user/3
-# (failed) curl http://localhost:8000/user -d "name=foo" -X PUT
+curl -H "Content-Type: application/json" -d '{"name":"foo"}' http://localhost:8000/api/user/3
+# (failed) curl http://localhost:8000/api/user -d "name=foo" -X PUT
 '''
 
 
@@ -53,13 +65,13 @@ class users(db.Model):
 
 
 # Define output data schema
-user_definition = {
+user_definition = api.model('User', {
     'user_id': fields.Integer,
     'name':    fields.String,
     'ssn':     fields.String,
     'email':   fields.String,
     'role':    fields.String
-}
+})
 
 
 class FormatUser(object):
@@ -71,9 +83,18 @@ class FormatUser(object):
         self.role = role
 
 
+class FormatString(object):
+    def __init__(self, data):
+        self.data = data
+
+
 # Define request parser
+# NOTE: This pattern has been deprecated; flask-restx will transition to marshmallow-like approach
 parser = reqparse.RequestParser()
-parser.add_argument('name', help="Name cannot be blank")
+parser.add_argument('name',  help="Name cannot be blank")
+parser.add_argument('ssn',   help="SSN cannot be blank")
+parser.add_argument('email', help="email cannot be blank")
+parser.add_argument('role',  help="Role cannot be blank")
 
 
 def get_user(user_id):
@@ -92,37 +113,40 @@ def get_user(user_id):
         print(e)
 
 
-# Resource-type class object to define functions for the RESTful API
+@api.doc()
+@api.route('/api/users/<int:user_id>')
 class UserAPI(Resource):
-    """
-    Under resource objects, you can define functions corresponding to HTTP requests
-    i.e. GET, POST, DELETE, etc.
-    """
 
     # marshal_with will serialize the API response to follow schema
     @marshal_with(user_definition)
     def get(self, user_id):
+        print(sanitizer(str(user_id)))
+        print('GET-ing', user_id, '...')
 
         return get_user(user_id)
 
     @marshal_with(user_definition)
-    def post(self, user_id):
-
+    def put(self, user_id):
+        print(sanitizer(user_id))
+        print('PUT-ing', user_id, '...')
         try:
             args = parser.parse_args()
-            new_user = users(user_id, args['name'])
+            for arg in args.values():
+                print(sanitizer(str(arg)))
+            new_user = users(user_id, args['name'], args['ssn'], args['email'], args['role'])
             db.session.add(new_user)
             db.session.commit()
 
-            return FormatUser(user_id, args['name'])
+            return FormatUser(user_id, args['name'], args['ssn'], args['email'], args['role'])
 
         except Exception as e:
-            print(e)
+            print('ERROR: ', e)
+            return FormatString(e)
 
-            return e
-
+    @marshal_with(user_definition)
     def delete(self, user_id):
-
+        print(sanitizer(str(user_id)))
+        print('DELETE-ing', user_id, '...')
         try:
             user = users.query.filter_by(id=user_id).first()
             if user:
@@ -133,13 +157,18 @@ class UserAPI(Resource):
                 return {'error': 'no such user found'}, 404
 
         except Exception as e:
-
+            print(e)
             return e
 
 
-# Use the API object to connect the Resource objects to paths on the Flask server
-# /<datatype: input_name> = a way to have variable paths
-api.add_resource(UserAPI, '/users/<int:user_id>')
+# Native Flask alternative
+# @app.route('/api')
+# def backend_health_check():
+#     return 'Server is functioning'
+
+# Flask-Restful alternative
+# api.add_resource(UserAPI, '/api/users/<int:user_id>')
+
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)
