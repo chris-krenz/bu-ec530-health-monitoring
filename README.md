@@ -61,6 +61,7 @@ python src/server.py
 Then from the webapp folder run:
 
 ```console
+npm install
 npm start
 ```
 
