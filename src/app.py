@@ -17,19 +17,22 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 # from requests import post, get, delete
 
-from CONFIG import ROOT_DIR
-from utils.misc.sanitizer import sanitizer
+# from CONFIG import ROOT_DIR
+# import CONFIG
+# from src.utils.misc.sanitizer import sanitizer
+
 
 # Connect to local '../data/database.db' SQLite file
 app = Flask(__name__)
 # app.secret_key = b'***************************************'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(ROOT_DIR, 'data', 'database.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data',
+                                                                    'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
 CORS(app)
 api = Api(app)
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 ''' Standard SQL Commands
@@ -43,6 +46,36 @@ ALTER TABLE main.users DROP COLUMN secret;  -- Delete a column from a table; ADD
 curl -H "Content-Type: application/json" -d '{"name":"foo"}' http://localhost:8000/api/user/3
 # (failed) curl http://localhost:8000/api/user -d "name=foo" -X PUT
 '''
+
+
+def sanitizer(message: bytes | str) -> str:
+    """
+    Sanitize message to ensure not malicious.  Primarily filters out SQL Queries.
+    Raises exception if match is found; otherwise returns string indicating message is clean.
+    The coincidental combination of these words with a ';' is relatively unlikely.
+    Will be false positives, but erring on the side of safety.
+    """
+    message = message.decode() if type(message) == bytes else message
+    message = str(message)
+    # (must also contain a ';')
+    restricted_sql = [['select',   'from'],
+                      ['drop',     'database'],
+                      ['drop',     'table'],
+                      ['drop',     'index'],
+                      ['update',   'set'],
+                      ['delete',   'from'],
+                      ['alter',    'table'],
+                      ['grant',    'to'],
+                      ['revoke',   'from'],
+                      ['truncate', 'table'],
+                      ['rollback', 'to']]
+
+    if ';' in message:
+        for keyword_set in restricted_sql:
+            if any([(keyword in message.lower()) for keyword in keyword_set]):
+                raise RuntimeError('You entered illegal characters, please try again...')
+
+    return 'Submitted message clean...'
 
 
 # Define SQLite table schema
@@ -162,9 +195,9 @@ class UserAPI(Resource):
 
 
 # Native Flask alternative
-# @app.route('/api')
-# def backend_health_check():
-#     return 'Server is functioning'
+@app.route('/api')
+def backend_health_check():
+    return 'Server is functioning'
 
 # Flask-Restful alternative
 # api.add_resource(UserAPI, '/api/users/<int:user_id>')

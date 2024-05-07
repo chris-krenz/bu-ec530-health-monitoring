@@ -2,22 +2,17 @@ services:
   server:
     build: .
     ports:
-      - "8000:8000"
-#    links:
-#      - "client"
-    command:
-      sh -c "python src/app.py"
+      - 8000:5000
+    environment:
+      - FLASK_ENV=development
 
-  client:
-    build: .
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
     ports:
-      - "443:443"
-#    links:
-#      - "server"
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
     depends_on:
       - server
-    command:
-      sh -c "python src/client.py"
-
-#volumes:
-#  app:
